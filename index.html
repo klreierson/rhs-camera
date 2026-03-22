@@ -898,7 +898,16 @@
     }
 
     /* Picker overlay: full width on mobile */
-    .picker-overlay { width: 75vw; max-width: 300px; }
+    .picker-overlay {
+      width: 72vw; max-width: 300px; min-width: 0;
+      overflow-x: hidden;
+    }
+    .picker-overlay .sl-area,
+    .picker-overlay .sl-area canvas { width: 160px; height: 160px; }
+    .picker-overlay .hue-bar-wrap,
+    .picker-overlay .hue-bar-wrap canvas { height: 160px; }
+    .picker-overlay-body { padding: 12px; }
+    .picker-overlay .picker-matches-panel .matches-swatches .swatch .color-block { height: 50px; }
 
     /* Color overlay: smaller text */
     .color-overlay-label { font-size: 2rem; }
