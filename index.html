@@ -692,10 +692,16 @@
   .cam-btn:hover { background: rgba(255,255,255,0.25); }
   .cam-btn.active { background: var(--brand-faint); color: var(--brand); font-weight: 700; border-color: var(--brand-faint); }
   .cam-close-btn {
-    background: none; border: none; color: rgba(255,255,255,0.7);
-    font-size: 1.4rem; cursor: pointer; padding: 0 4px; line-height: 1;
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+    color: #fff; font-size: 1.1rem; cursor: pointer;
+    padding: 5px 12px; border-radius: 6px; line-height: 1;
+    font-family: "AR One Sans", sans-serif;
+    min-width: 44px; min-height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: rgba(255,255,255,0.2);
+    touch-action: manipulation;
   }
-  .cam-close-btn:hover { color: #fff; }
+  .cam-close-btn:hover, .cam-close-btn:active { background: rgba(255,255,255,0.25); }
 
   .cam-viewport {
     position: relative; overflow: hidden;
@@ -1078,7 +1084,7 @@
       <div class="camera-header-btns">
         <button class="cam-btn" id="camFreezeBtn" style="display:none">Freeze</button>
         <button class="cam-btn" id="camFlipBtn" title="Switch camera" style="display:none">Flip</button>
-        <button class="cam-close-btn" id="camCloseBtn">&times;</button>
+        <button class="cam-close-btn" id="camCloseBtn">Close</button>
       </div>
     </div>
     <div class="cam-viewport" id="camViewport">
@@ -2599,9 +2605,15 @@ renderChart();
     camOverlay.classList.add('visible');
   });
 
-  camCloseBtn.addEventListener('click', () => {
+  function closeCamera() {
     camOverlay.classList.remove('visible');
     stopCamera();
+  }
+  camCloseBtn.addEventListener('click', closeCamera);
+  /* iOS Chrome: 'click' can be unreliable on small touch targets, so also listen for touchend */
+  camCloseBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    closeCamera();
   });
 
   camOverlay.addEventListener('click', (e) => {
