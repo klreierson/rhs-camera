@@ -4,10 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>RHS Camera Color Matcher</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
+  @font-face {
+    font-family: "AR One Sans";
+    src: url("AROneSans%5BARRR%2Cwght%5D.ttf") format("truetype");
+    font-weight: 100 900;
+    font-display: swap;
+  }
   :root {
     --brand: #1B4332; --brand-light: #2D6A4F; --brand-muted: #40916C;
     --brand-faint: #74C69D; --brand-bg: #F0F7F4; --brand-bg-alt: #FAFCFB;
@@ -16,7 +19,7 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; overflow: hidden; }
   body {
-    font-family: "Crimson Pro", Georgia, serif;
+    font-family: "AR One Sans", sans-serif;
     background: #000; color: #fff;
     display: flex; flex-direction: column;
     -webkit-user-select: none; user-select: none;
@@ -30,7 +33,7 @@
     z-index: 10; flex-shrink: 0;
   }
   .header h1 {
-    font-family: "Playfair Display", Georgia, serif;
+    font-family: "AR One Sans", sans-serif;
     font-size: 1.1rem; font-weight: 700; color: #fff;
   }
   .header .subtitle {
@@ -40,7 +43,7 @@
   .btn {
     background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
     color: #fff; padding: 6px 14px; border-radius: 6px; font-size: 0.8rem;
-    font-family: "Crimson Pro", Georgia, serif; cursor: pointer;
+    font-family: "AR One Sans", sans-serif; cursor: pointer;
     transition: background 0.15s;
   }
   .btn:hover, .btn:active { background: rgba(255,255,255,0.25); }
@@ -141,7 +144,7 @@
     position: relative;
   }
   .match-card .rhs-code {
-    font-family: "Playfair Display", Georgia, serif;
+    font-family: "AR One Sans", sans-serif;
     font-weight: 700; font-size: 0.9rem;
     text-shadow: 0 1px 3px rgba(0,0,0,0.4);
   }
@@ -168,13 +171,13 @@
     padding: 24px;
   }
   .start-screen h2 {
-    font-family: "Playfair Display", Georgia, serif; font-size: 1.6rem;
+    font-family: "AR One Sans", sans-serif; font-size: 1.6rem;
   }
   .start-screen p { font-size: 0.95rem; color: rgba(255,255,255,0.7); max-width: 340px; }
   .start-btn {
     background: #fff; color: var(--brand); border: none; padding: 14px 36px;
     border-radius: 10px; font-size: 1.1rem; font-weight: 700; cursor: pointer;
-    font-family: "Playfair Display", Georgia, serif;
+    font-family: "AR One Sans", sans-serif;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   }
   .start-btn:hover { background: #e8f5ee; }
@@ -188,12 +191,12 @@
   }
   .color-overlay.visible { display: flex; }
   .color-overlay-label {
-    font-family: "Playfair Display", Georgia, serif;
+    font-family: "AR One Sans", sans-serif;
     font-weight: 700; font-size: 2.5rem;
     text-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
   .color-overlay-sub {
-    font-family: "Crimson Pro", Georgia, serif;
+    font-family: "AR One Sans", sans-serif;
     font-size: 1rem; margin-top: 8px; text-align: center; line-height: 1.8;
     text-shadow: 0 1px 4px rgba(0,0,0,0.3);
   }

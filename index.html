@@ -4,13 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RHS Color Matcher</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 <style>
+  @font-face {
+    font-family: "AR One Sans";
+    src: url("AROneSans%5BARRR%2Cwght%5D.ttf") format("truetype");
+    font-weight: 100 900;
+    font-display: swap;
+  }
   :root {
     --brand: #1B4332;
     --brand-light: #2D6A4F;
@@ -23,7 +26,7 @@
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: "Crimson Pro", "Georgia", "Times New Roman", serif;
+    font-family: "AR One Sans", sans-serif;
     background: var(--brand-bg); color: var(--brand); padding: 0;
   }
 
@@ -36,36 +39,41 @@
   }
   .top-nav h1 {
     font-size: 1.3rem; margin-bottom: 2px;
-    font-family: "Playfair Display", "Georgia", serif; font-weight: 700;
+    font-family: "AR One Sans", sans-serif; font-weight: 700;
     letter-spacing: 0.02em; color: #fff;
   }
   .top-nav .subtitle {
     color: rgba(255,255,255,0.7); margin-bottom: 0;
     font-size: 0.8rem; font-style: italic;
   }
-  .nav-search {
-    display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+  .chart-search {
+    position: sticky; top: 52px; z-index: 15;
+    background: var(--brand-bg); padding: 10px 0;
   }
-  .nav-search input[type="text"] {
-    padding: 6px 12px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px;
-    font-size: 0.85rem; width: 260px; outline: none;
-    font-family: "Crimson Pro", "Georgia", serif; color: #fff;
-    background: rgba(255,255,255,0.15);
+  .chart-search input[type="text"] {
+    width: 100%; padding: 10px 16px;
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: 0.92rem; outline: none;
+    font-family: "AR One Sans", sans-serif; color: var(--brand);
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(27,67,50,0.08);
   }
-  .nav-search input[type="text"]::placeholder { color: rgba(255,255,255,0.5); }
-  .nav-search input[type="text"]:focus { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.22); }
-  .stats { font-size: 0.72rem; color: rgba(255,255,255,0.7); }
+  .chart-search input[type="text"]::placeholder { color: var(--brand-muted); }
+  .chart-search input[type="text"]:focus {
+    border-color: var(--brand-faint);
+    box-shadow: 0 1px 8px rgba(27,67,50,0.15);
+  }
 
   .page-body { padding: 20px; padding-bottom: 60px; }
 
   /* --- Source / disclaimer footer --- */
   .source-footer {
-    position: fixed; bottom: 0; left: 0; z-index: 18;
-    padding: 8px 16px; max-width: 680px; white-space: nowrap;
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 18;
+    padding: 6px 16px; white-space: nowrap;
     font-size: 0.72rem; line-height: 1.4; color: rgba(27,67,50,0.6);
     background: rgba(240,247,244,0.92); backdrop-filter: blur(4px);
-    border-top-right-radius: 8px;
-    border-top: 1px solid var(--border-light); border-right: 1px solid var(--border-light);
+    border-top: 1px solid var(--border-light);
+    text-align: center;
   }
   .source-footer a {
     color: var(--brand-muted); text-decoration: underline;
@@ -73,15 +81,13 @@
   }
   .source-footer a:hover { color: var(--brand); }
 
-  /* --- Main two-column layout --- */
+  /* --- Single column layout --- */
   .main-layout {
-    display: flex; gap: 24px; align-items: flex-start;
+    display: flex; flex-direction: column; gap: 20px;
+    max-width: 900px; margin: 0 auto;
   }
   .left-col {
-    flex: 1 1 56%; min-width: 0; position: sticky; top: 70px;
-  }
-  .right-col {
-    flex: 0 1 40%; min-width: 280px;
+    width: 100%;
   }
 
   /* --- Color tools panel (unified card) --- */
@@ -94,7 +100,7 @@
     font-weight: 700; font-size: 0.92rem; padding: 10px 18px;
     background: var(--brand-bg-alt); border-bottom: 1px solid var(--border-light);
     color: var(--brand-light);
-    font-family: "Playfair Display", "Georgia", serif;
+    font-family: "AR One Sans", sans-serif;
     display: flex; align-items: center; gap: 10px;
   }
   .tools-body {
@@ -146,18 +152,18 @@
     width: 56px; height: 56px; border-radius: 8px; border: 1px solid var(--border);
     display: flex; align-items: center; justify-content: center;
     font-size: 0.72rem; font-weight: 600; flex-shrink: 0;
-    font-family: "Crimson Pro", "Georgia", serif;
+    font-family: "AR One Sans", sans-serif;
   }
   .picker-text {
     display: flex; flex-direction: column; gap: 2px;
   }
   .picker-text .picker-hsl {
     font-size: 0.82rem; font-weight: 600; color: var(--brand);
-    font-family: "Crimson Pro", "Georgia", serif;
+    font-family: "AR One Sans", sans-serif;
   }
   .picker-hex {
     font-size: 0.75rem; color: var(--brand-muted);
-    font-family: "Crimson Pro", "Georgia", serif;
+    font-family: "AR One Sans", sans-serif;
   }
   .picker-actions {
     display: flex; align-items: center; gap: 6px;
@@ -189,7 +195,7 @@
   }
   .sampler-label {
     font-size: 0.85rem; font-weight: 700; color: var(--brand-light);
-    font-family: "Playfair Display", "Georgia", serif;
+    font-family: "AR One Sans", sans-serif;
   }
   .drop-zone {
     width: 200px; height: 200px; flex: none;
@@ -227,14 +233,23 @@
     display: none;
   }
   .sample-cursor.visible { display: block; }
+  .sample-cursor::before, .sample-cursor::after {
+    content: ''; position: absolute; background: currentColor;
+  }
+  .sample-cursor::before {
+    width: 1px; height: 100%; top: 0; left: 50%; transform: translateX(-50%);
+  }
+  .sample-cursor::after {
+    width: 100%; height: 1px; top: 50%; left: 0; transform: translateY(-50%);
+  }
   .change-image-btn {
     background: var(--brand); color: #fff; border: none; border-radius: 5px;
-    padding: 4px 10px; font-size: 0.72rem; font-family: 'Crimson Pro', serif;
-    cursor: pointer; align-self: flex-end; margin-bottom: 4px;
+    padding: 4px 10px; font-size: 0.72rem; font-family: 'AR One Sans', sans-serif;
+    cursor: pointer; align-self: center; margin-bottom: 4px;
   }
   .change-image-btn:hover { background: var(--brand-light); }
   .image-col {
-    display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
   }
   .image-hint {
     font-size: 0.74rem; color: var(--brand-muted); line-height: 1.5;
@@ -256,7 +271,7 @@
     font-weight: 700; font-size: 0.85rem; padding: 10px 14px;
     background: var(--brand-bg-alt); border-bottom: none; color: var(--brand-light);
     display: flex; align-items: center; gap: 10px;
-    font-family: "Playfair Display", "Georgia", serif;
+    font-family: "AR One Sans", sans-serif;
   }
   .matches-header .selected-swatch {
     width: 22px; height: 22px; border-radius: 4px; border: 1px solid var(--border); flex-shrink: 0;
@@ -266,10 +281,10 @@
     position: absolute; top: 4px; left: 6px;
     font-size: 0.6rem; font-weight: 700; background: rgba(27,67,50,0.5);
     color: #fff; padding: 1px 5px; border-radius: 3px;
-    font-family: "Crimson Pro", "Georgia", serif;
+    font-family: "AR One Sans", sans-serif;
   }
   .match-dist {
-    font-size: 0.65rem; color: var(--brand-muted); font-family: "Crimson Pro", "Georgia", serif;
+    font-size: 0.65rem; color: var(--brand-muted); font-family: "AR One Sans", sans-serif;
   }
 
   /* --- Color groups --- */
@@ -280,7 +295,7 @@
   .group-header {
     font-weight: 700; font-size: 0.88rem; padding: 8px 14px;
     background: var(--brand-bg-alt); border-bottom: 1px solid var(--border-light); color: var(--brand-light);
-    font-family: "Playfair Display", "Georgia", serif; letter-spacing: 0.01em;
+    font-family: "AR One Sans", sans-serif; letter-spacing: 0.01em;
   }
   .swatches { display: flex; flex-wrap: nowrap; }
   .swatch {
@@ -295,27 +310,27 @@
   .rhs-label {
     font-weight: 700; font-size: 0.95rem;
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    font-family: "Playfair Display", "Georgia", serif;
+    font-family: "AR One Sans", sans-serif;
   }
   .oog-badge {
     position: absolute; top: 4px; right: 6px;
     font-size: 0.55rem; background: rgba(27,67,50,0.45); color: #fff;
     padding: 1px 4px; border-radius: 3px;
-    font-family: "Crimson Pro", "Georgia", serif;
+    font-family: "AR One Sans", sans-serif;
   }
   .info {
     padding: 6px 8px; font-size: 0.72rem; line-height: 1.45;
     background: var(--brand-bg-alt); border-top: 1px solid var(--border-light); color: var(--brand-light);
     overflow: hidden;
   }
-  .info .val { font-family: "Crimson Pro", "Georgia", serif; font-weight: 600; color: var(--brand); }
+  .info .val { font-family: "AR One Sans", sans-serif; font-weight: 600; color: var(--brand); }
   .info .upov { font-style: italic; color: var(--brand-muted); margin-bottom: 2px; text-transform: capitalize; }
 
   .toast {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
     background: var(--brand); color: #fff; padding: 8px 18px; border-radius: 6px;
     font-size: 0.85rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 10000;
-    font-family: "Crimson Pro", "Georgia", serif;
+    font-family: "AR One Sans", sans-serif;
   }
   .toast.show { opacity: 1; }
 
@@ -327,12 +342,12 @@
   }
   .color-overlay.visible { opacity: 1; pointer-events: auto; }
   .color-overlay-label {
-    font-family: "Playfair Display", "Georgia", serif;
+    font-family: "AR One Sans", sans-serif;
     font-weight: 700; font-size: 3rem;
     text-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
   .color-overlay-sub {
-    font-family: "Crimson Pro", "Georgia", serif;
+    font-family: "AR One Sans", sans-serif;
     font-size: 1.2rem; margin-top: 8px; text-align: center; line-height: 1.8;
     text-shadow: 0 1px 4px rgba(0,0,0,0.3);
   }
@@ -346,7 +361,7 @@
   /* --- Dominant color chips (RHS matched) --- */
   .dominant-title {
     font-size: 0.82rem; font-weight: 700; color: var(--brand); margin-bottom: 4px;
-    font-family: "Playfair Display", "Georgia", serif;
+    font-family: "AR One Sans", sans-serif;
   }
   .dominant-row {
     display: flex; flex-direction: column; align-items: stretch; gap: 6px;
@@ -362,15 +377,15 @@
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
   .dominant-rhs-code {
-    font-family: "Playfair Display", "Georgia", serif;
+    font-family: "AR One Sans", sans-serif;
     font-weight: 700; font-size: 0.82rem;
     text-shadow: 0 1px 2px rgba(0,0,0,0.4);
   }
   .dominant-pct {
-    font-size: 0.75rem; color: var(--brand-muted); font-family: "Crimson Pro", "Georgia", serif; font-weight: 700; white-space: nowrap;
+    font-size: 0.75rem; color: var(--brand-muted); font-family: "AR One Sans", sans-serif; font-weight: 700; white-space: nowrap;
   }
   .dominant-upov {
-    font-size: 0.6rem; color: var(--brand-light); font-family: "Crimson Pro", "Georgia", serif;
+    font-size: 0.6rem; color: var(--brand-light); font-family: "AR One Sans", sans-serif;
     font-style: italic; text-transform: capitalize; text-align: left;
     max-width: none; line-height: 1.3;
   }
@@ -380,9 +395,9 @@
 
   /* --- Exclude-filter UI --- */
   .filter-toggle {
-    font-size: 0.68rem; color: var(--brand-muted); cursor: pointer;
-    font-family: "Crimson Pro", "Georgia", serif;
-    margin-top: 2px; user-select: none; display: inline-flex; align-items: center; gap: 3px;
+    font-size: 0.78rem; color: var(--brand-muted); cursor: pointer;
+    font-family: "AR One Sans", sans-serif;
+    margin-top: 14px; user-select: none; display: inline-flex; align-items: center; gap: 3px;
   }
   .filter-toggle:hover { color: var(--brand); }
   .filter-toggle .arrow { font-size: 0.55rem; transition: transform 0.2s; }
@@ -394,31 +409,114 @@
   .filter-panel.open { display: block; }
   .filter-panel label {
     font-size: 0.65rem; color: var(--brand); font-weight: 700;
-    font-family: "Crimson Pro", "Georgia", serif; display: block; margin-bottom: 3px;
+    font-family: "AR One Sans", sans-serif; display: block; margin-bottom: 3px;
   }
   .filter-input {
     width: 100%; box-sizing: border-box; font-size: 0.7rem; padding: 4px 6px;
     border: 1px solid var(--border); border-radius: 4px;
-    font-family: "Crimson Pro", "Georgia", serif; color: var(--brand);
+    font-family: "AR One Sans", sans-serif; color: var(--brand);
   }
   .filter-input:focus { outline: none; border-color: var(--brand-muted); }
   .filter-hint {
     font-size: 0.58rem; color: var(--brand-muted); margin-top: 2px; line-height: 1.4;
-    font-family: "Crimson Pro", "Georgia", serif;
+    font-family: "AR One Sans", sans-serif;
   }
   .filter-apply {
     margin-top: 5px; font-size: 0.65rem; padding: 3px 10px; border: 1px solid var(--brand);
     border-radius: 4px; background: var(--brand); color: #fff; cursor: pointer;
-    font-family: "Crimson Pro", "Georgia", serif;
+    font-family: "AR One Sans", sans-serif;
   }
   .filter-apply:hover { background: var(--brand-light); }
+
+  /* ── Picker wheel button ── */
+  .picker-wheel-btn {
+    background: none; border: none; cursor: pointer; padding: 2px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; transition: transform 0.3s ease, filter 0.2s, right 0.25s ease;
+    flex-shrink: 0; z-index: 51;
+  }
+  .picker-wheel-btn:hover {
+    transform: rotate(60deg) scale(1.1);
+    filter: brightness(1.15);
+  }
+  .picker-wheel-btn.picker-open {
+    position: fixed; top: 10px; right: 328px;
+  }
+  #openCameraBtn.picker-open {
+    position: fixed; top: 10px; right: 370px; z-index: 51;
+  }
+  @media (max-width: 640px) {
+    .picker-wheel-btn.picker-open {
+      right: calc(90vw + 8px);
+    }
+    #openCameraBtn.picker-open {
+      right: calc(90vw + 50px);
+    }
+  }
+
+  /* ── Color Picker Overlay ── */
+  .picker-overlay {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 50;
+    width: 320px; max-width: 90vw;
+    background: #fff; box-shadow: -4px 0 20px rgba(27,67,50,0.2);
+    transform: translateX(100%); transition: transform 0.25s ease;
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+  }
+  .picker-overlay.visible { transform: translateX(0); }
+  .picker-overlay-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; background: var(--brand-bg-alt);
+    border-bottom: 1px solid var(--border-light); flex-shrink: 0;
+  }
+  .picker-overlay-header h3 {
+    font-family: "AR One Sans", sans-serif;
+    font-size: 0.92rem; font-weight: 700; color: var(--brand-light); margin: 0;
+  }
+  .picker-overlay-close {
+    background: none; border: none; font-size: 1.3rem; cursor: pointer;
+    color: var(--brand-muted); line-height: 1; padding: 0 4px;
+  }
+  .picker-overlay-close:hover { color: var(--brand); }
+  .picker-overlay-body {
+    padding: 16px; display: flex; flex-direction: column; gap: 14px;
+  }
+  .picker-overlay-backdrop {
+    display: none;
+  }
+
+  /* Matches inside picker overlay */
+  .picker-overlay .picker-matches-panel {
+    border-top: 1px solid var(--border-light); padding-top: 12px;
+  }
+  .picker-overlay .picker-matches-title {
+    font-family: "AR One Sans", sans-serif;
+    font-size: 0.85rem; font-weight: 700; color: var(--brand-light);
+    margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+  }
+  .picker-overlay .picker-matches-title .selected-swatch {
+    width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border); flex-shrink: 0;
+  }
+  .picker-overlay .matches-swatches {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .picker-overlay .matches-swatches .swatch {
+    display: flex; flex-direction: row; align-items: stretch; flex: none;
+    border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px rgba(27,67,50,0.1);
+  }
+  .picker-overlay .matches-swatches .swatch .color-block {
+    width: 60px; height: auto; min-height: 50px; flex-shrink: 0;
+  }
+  .picker-overlay .matches-swatches .swatch .info {
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
+  }
 
   /* ── Camera Modal ── */
   .camera-nav-btn {
     background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
     color: #fff; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem;
-    font-family: "Crimson Pro", Georgia, serif; cursor: pointer;
-    display: flex; align-items: center; gap: 6px; transition: background 0.15s;
+    font-family: "AR One Sans", sans-serif; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; transition: background 0.15s, right 0.25s ease;
     white-space: nowrap;
   }
   .camera-nav-btn:hover { background: rgba(255,255,255,0.25); }
@@ -441,7 +539,7 @@
     display: flex; align-items: center; justify-content: space-between;
   }
   .batch-modal-header h2 {
-    font-family: "Playfair Display", Georgia, serif; font-size: 1.2rem;
+    font-family: "AR One Sans", sans-serif; font-size: 1.2rem;
     color: var(--brand); margin: 0;
   }
   .batch-close-btn {
@@ -498,13 +596,13 @@
   .batch-sort-bar label { font-weight: 600; white-space: nowrap; }
   .batch-sort-bar select {
     padding: 4px 8px; border: 1px solid var(--border); border-radius: 5px;
-    font-family: "Crimson Pro", Georgia, serif; font-size: 0.82rem;
+    font-family: "AR One Sans", sans-serif; font-size: 0.82rem;
     color: var(--brand); background: var(--brand-bg); cursor: pointer;
   }
   .batch-sort-dir {
     background: var(--brand-bg); border: 1px solid var(--border); border-radius: 5px;
     padding: 4px 9px; cursor: pointer; font-size: 0.85rem; color: var(--brand);
-    font-family: "Crimson Pro", Georgia, serif; line-height: 1;
+    font-family: "AR One Sans", sans-serif; line-height: 1;
   }
   .batch-sort-dir:hover { background: var(--border-light); }
   .batch-modal-footer {
@@ -513,7 +611,7 @@
   }
   .batch-btn {
     padding: 8px 20px; border-radius: 6px; font-size: 0.85rem;
-    font-family: "Crimson Pro", Georgia, serif; cursor: pointer; border: none;
+    font-family: "AR One Sans", sans-serif; cursor: pointer; border: none;
     transition: background 0.15s;
   }
   .batch-btn-primary {
@@ -544,7 +642,7 @@
     flex-shrink: 0;
   }
   .camera-modal-header h2 {
-    font-family: "Playfair Display", Georgia, serif;
+    font-family: "AR One Sans", sans-serif;
     font-size: 1rem; font-weight: 700; color: #fff; margin: 0;
   }
   .camera-modal-header .cam-subtitle {
@@ -554,7 +652,7 @@
   .cam-btn {
     background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
     color: #fff; padding: 5px 12px; border-radius: 6px; font-size: 0.78rem;
-    font-family: "Crimson Pro", Georgia, serif; cursor: pointer;
+    font-family: "AR One Sans", sans-serif; cursor: pointer;
     transition: background 0.15s;
   }
   .cam-btn:hover { background: rgba(255,255,255,0.25); }
@@ -613,13 +711,13 @@
     padding: 24px;
   }
   .cam-start-screen h3 {
-    font-family: "Playfair Display", Georgia, serif; font-size: 1.2rem; color: #fff;
+    font-family: "AR One Sans", sans-serif; font-size: 1.2rem; color: #fff;
   }
   .cam-start-screen p { font-size: 0.85rem; color: rgba(255,255,255,0.7); max-width: 300px; }
   .cam-start-btn {
     background: #fff; color: var(--brand); border: none; padding: 12px 30px;
     border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer;
-    font-family: "Playfair Display", Georgia, serif;
+    font-family: "AR One Sans", sans-serif;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   }
   .cam-start-btn:hover { background: #e8f5ee; }
@@ -674,7 +772,7 @@
     position: relative;
   }
   .cam-match-card .cam-rhs-code {
-    font-family: "Playfair Display", Georgia, serif;
+    font-family: "AR One Sans", sans-serif;
     font-weight: 700; font-size: 0.85rem;
     text-shadow: 0 1px 3px rgba(0,0,0,0.4);
   }
@@ -690,6 +788,89 @@
     font-size: 0.55rem;
   }
   .cam-match-card .cam-delta-e { font-weight: 600; }
+
+  /* ══════════════════════════════
+     Mobile responsive styles
+     ══════════════════════════════ */
+
+  /* Mobile */
+  @media (max-width: 640px) {
+    /* Nav bar: wrap into rows */
+    .top-nav {
+      flex-wrap: wrap; padding: 10px 14px; gap: 8px;
+    }
+    .nav-title {
+      flex: 1 1 100%; min-width: 0;
+    }
+    .top-nav h1 { font-size: 1.1rem; }
+    .top-nav .subtitle { font-size: 0.7rem; }
+    .camera-nav-btn {
+      padding: 5px 10px; font-size: 0.78rem;
+    }
+    .camera-nav-btn svg { width: 16px; height: 16px; }
+    /* Page body */
+    .page-body { padding: 12px; padding-bottom: 70px; }
+
+    /* Tools panel */
+    .tools-body {
+      flex-direction: column; gap: 16px; padding: 14px;
+    }
+    .sampler-body {
+      flex-direction: column; gap: 12px;
+    }
+    .dominant-sidebar {
+      min-width: 0; width: 100%;
+    }
+    .drop-zone {
+      width: 100%; height: 180px;
+    }
+    .drop-zone.has-image {
+      max-width: 100%;
+    }
+
+    /* Chart swatches: allow wrapping into 2x2 grid */
+    .swatches {
+      flex-wrap: wrap;
+    }
+    .swatch {
+      flex: 1 1 45%; min-width: 0;
+    }
+    .color-block { height: 70px; }
+    .info { font-size: 0.68rem; padding: 5px 6px; }
+
+    /* Matches panel: allow horizontal scroll */
+    .matches-swatches {
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+    }
+
+    /* Source footer */
+    .source-footer {
+      white-space: normal; font-size: 0.65rem;
+    }
+
+    /* Picker overlay: full width on mobile */
+    .picker-overlay { width: 100%; max-width: 100%; }
+
+    /* Color overlay: smaller text */
+    .color-overlay-label { font-size: 2rem; }
+    .color-overlay-sub { font-size: 1rem; }
+
+    /* Groups spacing */
+    .group { margin-bottom: 12px; }
+    .group-header { font-size: 0.82rem; padding: 7px 12px; }
+  }
+
+  /* Small phones */
+  @media (max-width: 380px) {
+    .top-nav { padding: 8px 10px; }
+    .top-nav h1 { font-size: 1rem; }
+    .page-body { padding: 8px; padding-bottom: 70px; }
+    .tools-body { padding: 10px; }
+    .sl-area, .sl-area canvas { width: 160px; height: 160px; }
+    .hue-bar-wrap, .hue-bar-wrap canvas { height: 160px; }
+    .color-block { height: 60px; }
+    .rhs-label { font-size: 0.82rem; }
+  }
 </style>
 </head>
 <body>
@@ -698,20 +879,31 @@
 <div class="top-nav">
   <div class="nav-title">
     <h1>RHS Color Matcher</h1>
-    <p class="subtitle">420 colors from the RHS Color Chart (Fifth Edition), converted to HSL and sRGB</p>
   </div>
   <button class="camera-nav-btn" id="openCameraBtn" title="Camera Color Matcher">
     <svg viewBox="0 0 24 24"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z"/><path d="M9 2 7.17 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3.17L15 2H9zm3 15a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/></svg>
     Camera
   </button>
+  <button class="picker-wheel-btn" id="openPickerBtn" title="Color Picker">
+    <svg viewBox="0 0 100 100" width="30" height="30">
+      <defs>
+        <clipPath id="wheelClip"><circle cx="50" cy="50" r="48"/></clipPath>
+      </defs>
+      <g clip-path="url(#wheelClip)">
+        <path d="M50 50 L50 2 A48 48 0 0 1 91.4 26Z" fill="#FF0000"/>
+        <path d="M50 50 L91.4 26 A48 48 0 0 1 91.4 74Z" fill="#FF8800"/>
+        <path d="M50 50 L91.4 74 A48 48 0 0 1 50 98Z" fill="#FFDD00"/>
+        <path d="M50 50 L50 98 A48 48 0 0 1 8.6 74Z" fill="#22CC44"/>
+        <path d="M50 50 L8.6 74 A48 48 0 0 1 8.6 26Z" fill="#2266FF"/>
+        <path d="M50 50 L8.6 26 A48 48 0 0 1 50 2Z" fill="#AA22FF"/>
+      </g>
+      <circle cx="50" cy="50" r="16" fill="white"/>
+    </svg>
+  </button>
   <button class="camera-nav-btn" id="openBatchBtn" title="Batch Analyze Folder">
     <svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6 10H6v-2h8v2zm4-4H6v-2h12v2z"/></svg>
     Batch
   </button>
-  <div class="nav-search">
-    <input type="text" id="search" placeholder="Search RHS code or UPOV name…">
-    <div class="stats" id="stats">105 groups · 420 colors</div>
-  </div>
 </div>
 
 <div class="page-body">
@@ -720,57 +912,19 @@
 <div class="main-layout">
 <div class="left-col">
 
-<!-- Closest matches -->
-<div class="matches-panel" id="matchesPanel">
-  <div class="matches-header">
-    <div class="selected-swatch" id="matchSwatch"></div>
-    <span id="matchTitle">Closest matches</span>
-  </div>
-  <div class="matches-swatches" id="matchesSwatches"></div>
-</div>
-
-<!-- Unified color tools panel -->
+<!-- Photo Reference panel -->
 <div class="tools-panel">
   <div class="tools-body">
-
-    <!-- Left: HSL picker -->
-    <div class="picker-col">
-      <div class="sampler-label">Color Picker</div>
-      <div class="picker-canvases">
-        <div class="hue-bar-wrap" id="hueBarWrap">
-          <canvas id="hueCanvas" width="22" height="200"></canvas>
-          <div class="hue-indicator" id="hueIndicator"></div>
-        </div>
-        <div class="sl-area" id="slArea">
-          <canvas id="slCanvas" width="200" height="200"></canvas>
-          <div class="sl-cursor" id="slCursor"></div>
-        </div>
-      </div>
-      <div class="picker-details">
-        <div class="picker-preview" id="pickerPreview"></div>
-        <div class="picker-text">
-          <div class="picker-hsl" id="pickerHslText">0° 100% 50%</div>
-          <div class="picker-hex" id="pickerHex">#ff0000</div>
-        </div>
-        <div class="native-input-row">
-          <input type="color" id="nativeColor" value="#ff0000" title="Browser color picker">
-        </div>
-      </div>
-    </div>
-
-    <div class="tools-divider"></div>
-
-    <!-- Right: Photo sampler -->
     <div class="sampler-col">
-      <div class="sampler-label">Photo Reference</div>
+      <div class="sampler-label" style="display:none;">Photo Reference</div>
       <div class="sampler-body">
         <div id="imageInfo" class="dominant-sidebar" style="display:none;">
-          <div class="dominant-title">Dominant RHS matches</div>
+          <div class="dominant-title">Top RHS matches</div>
           <div class="dominant-row" id="dominantRow"></div>
           <span class="filter-toggle" id="filterToggle"><span class="arrow">&#9654;</span> Exclude filter</span>
           <div class="filter-panel" id="filterPanel">
             <label>Excluded RHS groups</label>
-            <input type="text" class="filter-input" id="filterInput" value="126-148, 152-153, 156-157, 160-166, 172-177, 187A, 189, 191, 193, 194C, 195, 196C, 197, 198-202, N134B">
+            <input type="text" class="filter-input" id="filterInput" value="126-148, N134A, N134B, N138B, N137-N138, 152-157, 160-166, 172-177, 187-202">
             <div class="filter-hint">Ranges (e.g. 188-202) or single codes (e.g. 3A). Comma-separated.</div>
             <button class="filter-apply" id="filterApply">Apply</button>
           </div>
@@ -788,11 +942,13 @@
   </div>
 </div>
 
-</div><!-- end left-col -->
-
-<div class="right-col">
-  <div id="chart"></div>
+<div class="chart-search">
+  <input type="text" id="search" placeholder="Search by RHS code or color description">
 </div>
+
+<div id="chart"></div>
+
+</div><!-- end left-col -->
 
 </div><!-- end main-layout -->
 </div><!-- end page-body -->
@@ -835,6 +991,44 @@
   </div>
 </div>
 
+<!-- Color Picker Overlay -->
+<div class="picker-overlay-backdrop" id="pickerBackdrop"></div>
+<div class="picker-overlay" id="pickerOverlay">
+  <div class="picker-overlay-header">
+    <h3>Color Picker</h3>
+    <button class="picker-overlay-close" id="pickerCloseBtn">&times;</button>
+  </div>
+  <div class="picker-overlay-body">
+    <div class="picker-canvases">
+      <div class="hue-bar-wrap" id="hueBarWrap">
+        <canvas id="hueCanvas" width="22" height="200"></canvas>
+        <div class="hue-indicator" id="hueIndicator"></div>
+      </div>
+      <div class="sl-area" id="slArea">
+        <canvas id="slCanvas" width="200" height="200"></canvas>
+        <div class="sl-cursor" id="slCursor"></div>
+      </div>
+    </div>
+    <div class="picker-details" style="display:none;">
+      <div class="picker-preview" id="pickerPreview"></div>
+      <div class="picker-text">
+        <div class="picker-hsl" id="pickerHslText">0° 100% 50%</div>
+        <div class="picker-hex" id="pickerHex">#ff0000</div>
+      </div>
+      <div class="native-input-row">
+        <input type="color" id="nativeColor" value="#ff0000" title="Browser color picker">
+      </div>
+    </div>
+    <div class="picker-matches-panel" id="pickerMatchesPanel" style="display:none;">
+      <div class="picker-matches-title">
+        <div class="selected-swatch" id="matchSwatch"></div>
+        <span id="matchTitle">Top 5 RHS matches</span>
+      </div>
+      <div class="matches-swatches" id="matchesSwatches"></div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast">Copied!</div>
 <div class="color-overlay" id="colorOverlay">
   <div class="color-overlay-label" id="overlayLabel"></div>
@@ -845,20 +1039,17 @@
 <div class="camera-modal-overlay" id="cameraModalOverlay">
   <div class="camera-modal">
     <div class="camera-modal-header">
-      <div>
-        <h2>RHS Color Matcher</h2>
-        <div class="cam-subtitle">Camera or photo · Tap to sample</div>
-      </div>
+      <div></div>
       <div class="camera-header-btns">
-        <button class="cam-btn" id="camFreezeBtn">Freeze</button>
-        <button class="cam-btn" id="camFlipBtn" title="Switch camera">Flip</button>
+        <button class="cam-btn" id="camFreezeBtn" style="display:none">Freeze</button>
+        <button class="cam-btn" id="camFlipBtn" title="Switch camera" style="display:none">Flip</button>
         <button class="cam-close-btn" id="camCloseBtn">&times;</button>
       </div>
     </div>
     <div class="cam-viewport" id="camViewport">
       <div class="cam-start-screen" id="camStartScreen">
         <h3>Color Matcher</h3>
-        <p>Point your camera at a flower or upload a photo to find RHS Color Chart matches</p>
+        <p>Point your camera at a flower or upload a photo to find RHS Color matches</p>
         <button class="cam-start-btn" id="camStartBtn">Start Camera</button>
         <div class="cam-or-divider"><span>or</span></div>
         <button class="cam-start-btn cam-upload-btn" id="camUploadBtn">Upload Photo</button>
@@ -872,10 +1063,10 @@
       <div class="cam-tap-hint">Tap anywhere to sample a color</div>
     </div>
     <div class="cam-result-panel">
-      <div class="cam-sampled-swatch" id="camSampledSwatch">
+      <div class="cam-sampled-swatch" id="camSampledSwatch" style="display:none">
         <div class="cam-sampled-label">Sampled</div>
       </div>
-      <div class="cam-arrow-sep">&rarr;</div>
+      <div class="cam-arrow-sep" style="display:none">&rarr;</div>
       <div class="cam-matches-row" id="camMatchesRow"></div>
     </div>
   </div>
@@ -1166,26 +1357,42 @@ function findClosestRHS(h, s, l) {
 /* RHS exclusions for dominant-color matching — built from filter input */
 let DOMINANT_EXCLUDE_GROUPS = new Set();
 let DOMINANT_EXCLUDE_CODES = new Set();   /* specific codes like "3A" */
+let DOMINANT_EXCLUDE_NGROUPS = new Set(); /* N-prefix group numbers */
 
 function parseExcludeFilter(text) {
-  const groups = new Set();
-  const codes = new Set();
+  const groups = new Set();       /* numeric group numbers like 194 */
+  const codes = new Set();        /* specific codes like "3A", "N134B" */
+  const nGroups = new Set();      /* N-prefix group numbers like 134 (for N134x) */
   text.split(',').forEach(part => {
-    part = part.trim();
+    part = part.trim().toUpperCase();
     if (!part) return;
-    /* Range like 188-202 */
-    const rangeMatch = part.match(/^(\d+)\s*-\s*(\d+)$/);
-    if (rangeMatch) {
-      const lo = parseInt(rangeMatch[1], 10), hi = parseInt(rangeMatch[2], 10);
+    /* Numeric range like 188-202 */
+    const numRange = part.match(/^(\d+)\s*-\s*(\d+)$/);
+    if (numRange) {
+      const lo = parseInt(numRange[1], 10), hi = parseInt(numRange[2], 10);
       for (let g = Math.min(lo, hi); g <= Math.max(lo, hi); g++) groups.add(g);
       return;
     }
-    /* Single group number like 155 */
+    /* N-prefix range like N137-N138 */
+    const nRange = part.match(/^N(\d+)\s*-\s*N(\d+)$/);
+    if (nRange) {
+      const lo = parseInt(nRange[1], 10), hi = parseInt(nRange[2], 10);
+      for (let g = Math.min(lo, hi); g <= Math.max(lo, hi); g++) nGroups.add(g);
+      return;
+    }
+    /* Single numeric group like 155 */
     if (/^\d+$/.test(part)) { groups.add(parseInt(part, 10)); return; }
+    /* Single N-prefix code like N134B or N134 (whole N-group) */
+    const nSingle = part.match(/^N(\d+)([A-Z])?$/);
+    if (nSingle) {
+      if (nSingle[2]) { codes.add(part); }  /* specific like N134B */
+      else { nGroups.add(parseInt(nSingle[1], 10)); } /* whole N-group like N134 */
+      return;
+    }
     /* Specific code like 3A or 152B */
-    codes.add(part.toUpperCase());
+    codes.add(part);
   });
-  return { groups, codes };
+  return { groups, codes, nGroups };
 }
 
 function applyExcludeFilter() {
@@ -1193,26 +1400,36 @@ function applyExcludeFilter() {
   const parsed = parseExcludeFilter(input.value);
   DOMINANT_EXCLUDE_GROUPS = parsed.groups;
   DOMINANT_EXCLUDE_CODES = parsed.codes;
+  DOMINANT_EXCLUDE_NGROUPS = parsed.nGroups;
   rematchDominantColors();
 }
 
 /* Initialise defaults */
 (function() {
-  const parsed = parseExcludeFilter('126-148, 152-153, 156-157, 160-166, 172-177, 187A, 189, 191, 193, 194C, 195, 196C, 197, 198-202, N134B');
+  const parsed = parseExcludeFilter('126-148, N134A, N134B, N138B, N137-N138, 152-157, 160-166, 172-177, 187-202');
   DOMINANT_EXCLUDE_GROUPS = parsed.groups;
   DOMINANT_EXCLUDE_CODES = parsed.codes;
+  DOMINANT_EXCLUDE_NGROUPS = parsed.nGroups;
 })();
 
-function findClosestRHSFromRGB(r, g, b, excludeGroups, excludeCodes) {
+function findClosestRHSFromRGB(r, g, b, excludeGroups, excludeCodes, excludeNGroups) {
   const lab = srgbToLab(r, g, b);
   let best = ALL_COLORS[0], bestD = Infinity;
   for (const c of ALL_COLORS) {
+    const code = c.rhs.toUpperCase();
+    /* Check numeric group exclusion (handles 194A, 194B etc via group 194) */
     if (excludeGroups && excludeGroups.size) {
-      const grp = parseInt(c.rhs, 10);
-      if (excludeGroups.has(grp)) continue;
+      const grp = parseInt(code, 10);
+      if (!isNaN(grp) && excludeGroups.has(grp)) continue;
     }
+    /* Check N-prefix group exclusion (handles N137A, N137D etc via nGroup 137) */
+    if (excludeNGroups && excludeNGroups.size) {
+      const nMatch = code.match(/^N(\d+)/);
+      if (nMatch && excludeNGroups.has(parseInt(nMatch[1], 10))) continue;
+    }
+    /* Check specific code exclusion */
     if (excludeCodes && excludeCodes.size) {
-      if (excludeCodes.has(c.rhs.toUpperCase())) continue;
+      if (excludeCodes.has(code)) continue;
     }
     const d = ciede2000(lab, c._lab);
     if (d < bestD) { bestD = d; best = c; }
@@ -1230,13 +1447,13 @@ function findAndShowMatches() {
 /* (matches update live via updatePreview throttle) */
 
 function showMatches(h, s, l, matches) {
-  const panel = document.getElementById('matchesPanel');
+  const panel = document.getElementById('pickerMatchesPanel');
   const sw = document.getElementById('matchSwatch');
   const title = document.getElementById('matchTitle');
   const container = document.getElementById('matchesSwatches');
 
   sw.style.background = `hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(l)}%)`;
-  title.textContent = 'Top 5 RHS matches';
+  title.textContent = 'RHS matches';
   container.innerHTML = '';
 
   matches.forEach((c, i) => {
@@ -1253,7 +1470,6 @@ function showMatches(h, s, l, matches) {
     el.innerHTML = `
       <div class="color-block" style="background:${css}">
         <span class="rhs-label" style="color:${tc}">${c.rhs}</span>
-        <span class="match-rank">#${i+1}</span>
         ${c.oog ? '<span class="oog-badge">out of gamut</span>' : ''}
       </div>
       <div class="info">
@@ -1265,7 +1481,7 @@ function showMatches(h, s, l, matches) {
     container.appendChild(el);
   });
 
-  panel.classList.add('visible');
+  panel.style.display = 'block';
 }
 
 /* ══════════════════════════════
@@ -1490,7 +1706,7 @@ function rematchDominantColors(autoSetPicker) {
   dominantRow.innerHTML = '';
   const rhsMatches = rawCentroids.map(col => ({
     ...col,
-    rhs: findClosestRHSFromRGB(col.r, col.g, col.b, DOMINANT_EXCLUDE_GROUPS, DOMINANT_EXCLUDE_CODES)
+    rhs: findClosestRHSFromRGB(col.r, col.g, col.b, DOMINANT_EXCLUDE_GROUPS, DOMINANT_EXCLUDE_CODES, DOMINANT_EXCLUDE_NGROUPS)
   }));
   dominantColors = rhsMatches;
 
@@ -1586,7 +1802,9 @@ function samplePixelAt(clientX, clientY) {
     cursor.classList.add('visible');
     cursor.style.left = (px * 100) + '%';
     cursor.style.top  = (py * 100) + '%';
-    cursor.style.borderColor = l > 55 ? 'rgba(0,0,0,0.7)' : '#fff';
+    const cursorColor = l > 55 ? 'rgba(0,0,0,0.7)' : '#fff';
+    cursor.style.borderColor = cursorColor;
+    cursor.style.color = cursorColor;
   }
 
   setPickerFromHsl(h, s, l);
@@ -1880,7 +2098,8 @@ function renderChart(filter) {
     chart.appendChild(groupEl);
   }
 
-  document.getElementById('stats').textContent =
+  const statsEl = document.getElementById('stats');
+  if (statsEl) statsEl.textContent =
     `${groupCount} group${groupCount!==1?'s':''} · ${colorCount} color${colorCount!==1?'s':''}`;
 }
 
@@ -1943,6 +2162,33 @@ positionHueIndicator();
 positionSLCursor();
 updatePreview();
 renderChart();
+
+/* ═══════════════════════════════════
+   Color Picker Overlay
+   ═══════════════════════════════════ */
+{
+  const pickerOverlay = document.getElementById('pickerOverlay');
+  const pickerBackdrop = document.getElementById('pickerBackdrop');
+  const openPickerBtn = document.getElementById('openPickerBtn');
+  const pickerCloseBtn = document.getElementById('pickerCloseBtn');
+
+  const openCameraBtn = document.getElementById('openCameraBtn');
+  function openPicker() {
+    pickerOverlay.classList.add('visible');
+    openPickerBtn.classList.add('picker-open');
+    openCameraBtn.classList.add('picker-open');
+  }
+  function closePicker() {
+    pickerOverlay.classList.remove('visible');
+    openPickerBtn.classList.remove('picker-open');
+    openCameraBtn.classList.remove('picker-open');
+  }
+  openPickerBtn.addEventListener('click', () => {
+    pickerOverlay.classList.contains('visible') ? closePicker() : openPicker();
+  });
+  pickerCloseBtn.addEventListener('click', closePicker);
+  pickerBackdrop.addEventListener('click', closePicker);
+}
 
 /* ═══════════════════════════════════
    Camera Color Matcher (modal)
@@ -2187,12 +2433,9 @@ renderChart();
     const overlay = document.getElementById('colorOverlay');
     const label = document.getElementById('overlayLabel');
     const sub = document.getElementById('overlaySub');
-    const hint = document.getElementById('overlayHint');
     overlay.style.background = css;
     label.style.color = tc;
     sub.style.color = tc;
-    hint.style.color = tc;
-    hint.textContent = 'click to copy sRGB';
     const clipSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
     const hslVal = `${m.h}, ${m.s}%, ${m.l}%`;
     const rgbVal = `${m.r}, ${m.g}, ${m.b}`;
@@ -2228,8 +2471,8 @@ renderChart();
     camViewport.classList.remove('photo-mode');
     camFreezeBtn.textContent = 'Freeze';
     camFreezeBtn.classList.remove('active');
-    camFreezeBtn.style.display = '';
-    camFlipBtn.style.display = '';
+    camFreezeBtn.style.display = 'none';
+    camFlipBtn.style.display = 'none';
     camStartScreen.style.display = '';
     camErrorMsg.style.display = 'none';
     camMatchesRow.innerHTML = '';
@@ -2280,7 +2523,6 @@ loadImageFromSrc('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIODg4
   const progressFill  = document.getElementById('batchProgressFill');
   const progressText  = document.getElementById('batchProgressText');
   const summaryDiv    = document.getElementById('batchSummary');
-  const exportBtn      = document.getElementById('batchExportBtn');
   const exportPdfBtn   = document.getElementById('batchExportPdfBtn');
   const exportXlsxBtn  = document.getElementById('batchExportXlsxBtn');
   const resetBtn       = document.getElementById('batchResetBtn');
@@ -2333,11 +2575,23 @@ loadImageFromSrc('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIODg4
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('visible'); });
   folderZone.addEventListener('click', () => { if (!batchResults.length) folderInput.click(); });
 
-  folderInput.addEventListener('change', async e => {
-    const files = Array.from(e.target.files).filter(f => /\.(jpe?g|png|webp)$/i.test(f.name));
-    if (!files.length) { alert('No image files (JPG/PNG/WebP) found in the selected folder.'); return; }
+  /* Drag-and-drop support */
+  folderZone.addEventListener('dragover', e => { e.preventDefault(); e.stopPropagation(); folderZone.style.borderColor = 'var(--brand)'; folderZone.style.background = 'var(--brand-bg)'; });
+  folderZone.addEventListener('dragleave', e => { e.preventDefault(); e.stopPropagation(); folderZone.style.borderColor = ''; folderZone.style.background = ''; });
+  folderZone.addEventListener('drop', e => {
+    e.preventDefault(); e.stopPropagation();
+    folderZone.style.borderColor = ''; folderZone.style.background = '';
+    if (batchResults.length) return;
+    const files = Array.from(e.dataTransfer.files).filter(f =>
+      /\.(jpe?g|png|webp|heic|heif|tiff?|bmp|gif)$/i.test(f.name) ||
+      (f.type && f.type.startsWith('image/'))
+    );
+    if (!files.length) { alert('No image files (JPG/PNG/WebP) found. Please drop JPG, PNG, or WebP files.'); return; }
+    processBatchFiles(files);
+  });
+
+  async function processBatchFiles(files) {
     batchResults = [];
-    exportBtn.disabled = true;
     exportPdfBtn.disabled = true;
     exportXlsxBtn.disabled = true;
     resetBtn.style.display = 'none';
@@ -2356,17 +2610,21 @@ loadImageFromSrc('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIODg4
       const pct = Math.round(((i + 1) / files.length) * 100);
       progressFill.style.width = pct + '%';
       progressText.textContent = `Analyzing ${i + 1} / ${files.length}…`;
-      /* Yield to UI thread */
       await new Promise(r => setTimeout(r, 0));
     }
 
     progressText.textContent = `Done — ${batchResults.filter(r => !r.error).length} of ${files.length} images analyzed.`;
-    exportBtn.disabled = false;
     exportPdfBtn.disabled = false;
     exportXlsxBtn.disabled = false;
     resetBtn.style.display = '';
     sortBar.classList.add('visible');
     showBatchSummary();
+  }
+
+  folderInput.addEventListener('change', e => {
+    const files = Array.from(e.target.files).filter(f => /\.(jpe?g|png|webp)$/i.test(f.name));
+    if (!files.length) { alert('No image files (JPG/PNG/WebP) found in the selected folder.'); return; }
+    processBatchFiles(files);
   });
 
   function analyzeImageFile(file) {
@@ -2464,7 +2722,7 @@ loadImageFromSrc('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIODg4
     clusters.sort((a, b) => b.pct - a.pct);
 
     const top = clusters[0];
-    const rhs = findClosestRHSFromRGB(top.r, top.g, top.b, DOMINANT_EXCLUDE_GROUPS, DOMINANT_EXCLUDE_CODES);
+    const rhs = findClosestRHSFromRGB(top.r, top.g, top.b, DOMINANT_EXCLUDE_GROUPS, DOMINANT_EXCLUDE_CODES, DOMINANT_EXCLUDE_NGROUPS);
 
     /* Build top-5 matches for the dominant cluster's color */
     const topLab = srgbToLab(top.r, top.g, top.b);
@@ -2510,56 +2768,6 @@ loadImageFromSrc('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIODg4
     summaryDiv.classList.add('visible');
   }
 
-  exportBtn.addEventListener('click', () => {
-    const valid = getSortedResults();
-    if (!valid.length) return;
-    function rgbToHex(r, g, b) {
-      return '#' + [r, g, b].map(v => Math.round(v).toString(16).padStart(2, '0')).join('');
-    }
-    const headers = [
-      'File Name',
-      'Top RHS Code', 'Top RHS Color', 'UPOV Name', 'Delta E',
-      'RHS R', 'RHS G', 'RHS B', 'RHS H', 'RHS S', 'RHS L',
-      'Image Dominant R', 'Image Dominant G', 'Image Dominant B', 'Dominant %',
-      '2nd RHS Code', '2nd RHS Color', '2nd UPOV', '2nd Delta E',
-      '3rd RHS Code', '3rd RHS Color', '3rd UPOV', '3rd Delta E',
-      '4th RHS Code', '4th RHS Color', '4th UPOV', '4th Delta E',
-      '5th RHS Code', '5th RHS Color', '5th UPOV', '5th Delta E'
-    ];
-    const rows = valid.map(r => {
-      const row = [
-        r.fileName,
-        r.rhsCode, rgbToHex(r.rhsR, r.rhsG, r.rhsB), r.rhsUpov, r.rhsDist.toFixed(2),
-        r.rhsR, r.rhsG, r.rhsB, r.rhsH, r.rhsS, r.rhsL,
-        r.imgR, r.imgG, r.imgB, r.imgPct
-      ];
-      /* Top-5 extra columns (2nd through 5th) */
-      for (let i = 1; i < 5; i++) {
-        if (r.top5 && r.top5[i]) {
-          row.push(r.top5[i].rhs, rgbToHex(r.top5[i].r, r.top5[i].g, r.top5[i].b), r.top5[i].upov, r.top5[i].dist.toFixed(2));
-        } else {
-          row.push('', '', '', '');
-        }
-      }
-      return row;
-    });
-    const csvContent = [headers, ...rows]
-      .map(row => row.map(v => {
-        const s = String(v);
-        return s.includes(',') || s.includes('"') || s.includes('\n')
-          ? '"' + s.replace(/"/g, '""') + '"' : s;
-      }).join(','))
-      .join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'rhs-batch-analysis.csv';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  });
 
   /* ── XLSX Export ── */
   exportXlsxBtn.addEventListener('click', () => {
@@ -2752,7 +2960,6 @@ loadImageFromSrc('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIODg4
 
   resetBtn.addEventListener('click', () => {
     batchResults = [];
-    exportBtn.disabled = true;
     exportPdfBtn.disabled = true;
     exportXlsxBtn.disabled = true;
     resetBtn.style.display = 'none';
@@ -2767,8 +2974,7 @@ loadImageFromSrc('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABIODg4
 </script>
 
 <div class="source-footer">
-  Color data source: <a href="https://github.com/danielgtaylor/rhs-color" target="_blank" rel="noopener">danielgtaylor/rhs-color</a><br>
-  Note: These are approximations only. Accuracy depends on color calibration, gamma settings, and various other factors.
+  Color data source: <a href="https://github.com/danielgtaylor/rhs-color" target="_blank" rel="noopener">danielgtaylor/rhs-color</a> · Note: These are approximations only. Accuracy depends on color calibration, gamma settings, and various other factors.
 </div>
 
 </body>
