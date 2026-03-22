@@ -231,6 +231,7 @@
     box-shadow: 0 0 0 1.5px rgba(0,0,0,0.4);
     pointer-events: none; transform: translate(-50%, -50%);
     display: none;
+    transition: width 0.15s, height 0.15s;
   }
   .sample-cursor.visible { display: block; }
   .sample-cursor::before, .sample-cursor::after {
@@ -241,6 +242,39 @@
   }
   .sample-cursor::after {
     width: 100%; height: 1px; top: 50%; left: 0; transform: translateY(-50%);
+  }
+  /* ── Touch magnifier loupe ── */
+  .touch-loupe {
+    position: absolute; width: 90px; height: 90px;
+    border-radius: 50%; border: 3px solid #fff;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4), 0 0 0 1.5px rgba(0,0,0,0.2);
+    pointer-events: none; display: none; z-index: 20;
+    overflow: hidden; transform: translate(-50%, -100%);
+    margin-top: -30px; /* offset above finger */
+    background: #000;
+  }
+  .touch-loupe.visible { display: block; }
+  .touch-loupe canvas {
+    width: 100%; height: 100%; display: block;
+  }
+  .touch-loupe-crosshair {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+  }
+  .touch-loupe-crosshair::before, .touch-loupe-crosshair::after {
+    content: ''; position: absolute; background: rgba(255,255,255,0.6);
+  }
+  .touch-loupe-crosshair::before {
+    width: 1px; height: 100%; left: 50%; top: 0; transform: translateX(-50%);
+  }
+  .touch-loupe-crosshair::after {
+    width: 100%; height: 1px; top: 50%; left: 0; transform: translateY(-50%);
+  }
+  .touch-loupe-dot {
+    position: absolute; width: 6px; height: 6px;
+    border: 1.5px solid #fff; border-radius: 50%;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    box-shadow: 0 0 2px rgba(0,0,0,0.5);
   }
   .change-image-btn {
     background: var(--brand); color: #fff; border: none; border-radius: 5px;
@@ -822,11 +856,12 @@
       min-width: 0; width: 100%;
     }
     .drop-zone {
-      width: 100%; height: 180px;
+      width: 100%; height: 200px;
     }
     .drop-zone.has-image {
       max-width: 100%;
     }
+    .sample-cursor { width: 30px; height: 30px; border-width: 3px; }
 
     /* Chart swatches: allow wrapping into 2x2 grid */
     .swatches {
@@ -1563,6 +1598,20 @@ function loadImageFromSrc(src, fileName) {
     cursor.className = 'sample-cursor';
     cursor.id = 'sampleCursor';
     wrapper.appendChild(cursor);
+    /* Touch magnifier loupe */
+    const loupe = document.createElement('div');
+    loupe.className = 'touch-loupe';
+    loupe.id = 'touchLoupe';
+    const loupeCanvas = document.createElement('canvas');
+    loupeCanvas.width = 90; loupeCanvas.height = 90;
+    loupe.appendChild(loupeCanvas);
+    const loupeCross = document.createElement('div');
+    loupeCross.className = 'touch-loupe-crosshair';
+    loupe.appendChild(loupeCross);
+    const loupeDot = document.createElement('div');
+    loupeDot.className = 'touch-loupe-dot';
+    loupe.appendChild(loupeDot);
+    wrapper.appendChild(loupe);
     dropZone.appendChild(wrapper);
     /* Show filename below the image */
     if (fileName) {
@@ -1810,21 +1859,85 @@ function samplePixelAt(clientX, clientY) {
   setPickerFromHsl(h, s, l);
 }
 
+/* ── Magnifier loupe for touch ── */
+const LOUPE_ZOOM = 4; /* magnification factor */
+const LOUPE_SIZE = 90;
+
+function updateLoupe(px, py) {
+  const loupe = document.getElementById('touchLoupe');
+  if (!loupe || !imgCanvas) return;
+  loupe.classList.add('visible');
+  /* Position loupe above the sample point */
+  loupe.style.left = (px * 100) + '%';
+  loupe.style.top  = (py * 100) + '%';
+  /* Draw zoomed region from the source image */
+  const lCanvas = loupe.querySelector('canvas');
+  const lCtx = lCanvas.getContext('2d');
+  const srcX = px * imgCanvas.width;
+  const srcY = py * imgCanvas.height;
+  const srcRadius = (LOUPE_SIZE / 2) / LOUPE_ZOOM;
+  lCtx.clearRect(0, 0, LOUPE_SIZE, LOUPE_SIZE);
+  /* Clip to circle */
+  lCtx.save();
+  lCtx.beginPath();
+  lCtx.arc(LOUPE_SIZE / 2, LOUPE_SIZE / 2, LOUPE_SIZE / 2, 0, Math.PI * 2);
+  lCtx.clip();
+  lCtx.drawImage(imgCanvas,
+    srcX - srcRadius, srcY - srcRadius, srcRadius * 2, srcRadius * 2,
+    0, 0, LOUPE_SIZE, LOUPE_SIZE
+  );
+  lCtx.restore();
+}
+
+function hideLoupe() {
+  const loupe = document.getElementById('touchLoupe');
+  if (loupe) loupe.classList.remove('visible');
+}
+
 let imgDown = false;
+let isTouchSampling = false;
+
 dropZone.addEventListener('mousedown', e => {
   if (!loadedImg) return;
-  imgDown = true; e.preventDefault(); samplePixelAt(e.clientX, e.clientY);
+  imgDown = true; isTouchSampling = false;
+  e.preventDefault(); samplePixelAt(e.clientX, e.clientY);
 });
 window.addEventListener('mousemove', e => { if (imgDown) samplePixelAt(e.clientX, e.clientY); });
 window.addEventListener('mouseup', () => { imgDown = false; });
+
 dropZone.addEventListener('touchstart', e => {
   if (!loadedImg) return;
-  imgDown = true; e.preventDefault(); samplePixelAt(e.touches[0].clientX, e.touches[0].clientY);
-});
+  imgDown = true; isTouchSampling = true;
+  e.preventDefault();
+  samplePixelAt(e.touches[0].clientX, e.touches[0].clientY);
+  /* Show loupe on touch */
+  const imgEl = dropZone.querySelector('img');
+  if (imgEl) {
+    const rect = imgEl.getBoundingClientRect();
+    const px = (e.touches[0].clientX - rect.left) / rect.width;
+    const py = (e.touches[0].clientY - rect.top) / rect.height;
+    if (px >= 0 && px <= 1 && py >= 0 && py <= 1) updateLoupe(px, py);
+  }
+}, { passive: false });
+
 dropZone.addEventListener('touchmove', e => {
-  if (imgDown) { e.preventDefault(); samplePixelAt(e.touches[0].clientX, e.touches[0].clientY); }
+  if (!imgDown) return;
+  e.preventDefault();
+  samplePixelAt(e.touches[0].clientX, e.touches[0].clientY);
+  /* Update loupe position */
+  const imgEl = dropZone.querySelector('img');
+  if (imgEl) {
+    const rect = imgEl.getBoundingClientRect();
+    const px = (e.touches[0].clientX - rect.left) / rect.width;
+    const py = (e.touches[0].clientY - rect.top) / rect.height;
+    if (px >= 0 && px <= 1 && py >= 0 && py <= 1) updateLoupe(px, py);
+  }
+}, { passive: false });
+
+dropZone.addEventListener('touchend', () => {
+  imgDown = false; isTouchSampling = false;
+  hideLoupe();
 });
-dropZone.addEventListener('touchend', () => { imgDown = false; });
 
 /* ── Image zoom on scroll ── */
 let imgZoom = 1;
