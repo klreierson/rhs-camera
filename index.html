@@ -64,14 +64,15 @@
     box-shadow: 0 1px 8px rgba(27,67,50,0.15);
   }
 
-  .page-body { padding: 20px; padding-bottom: 60px; }
+  .page-body { padding: 20px; padding-bottom: 20px; }
 
   /* --- Source / disclaimer footer --- */
   .source-footer {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 18;
+    position: sticky; bottom: 0; left: 0; right: 0; z-index: 18;
     padding: 6px 16px; white-space: nowrap;
     font-size: 0.72rem; line-height: 1.4; color: rgba(27,67,50,0.6);
     background: rgba(240,247,244,0.92); backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     border-top: 1px solid var(--border-light);
     text-align: center;
   }
@@ -849,7 +850,7 @@
     }
     .camera-nav-btn svg { width: 16px; height: 16px; }
     /* Page body */
-    .page-body { padding: 12px; padding-bottom: 70px; }
+    .page-body { padding: 12px; padding-bottom: 12px; }
 
     /* Tools panel */
     .tools-body {
@@ -905,7 +906,7 @@
   @media (max-width: 380px) {
     .top-nav { padding: 8px 10px; }
     .top-nav h1 { font-size: 1rem; }
-    .page-body { padding: 8px; padding-bottom: 70px; }
+    .page-body { padding: 8px; padding-bottom: 12px; }
     .tools-body { padding: 10px; }
     .sl-area, .sl-area canvas { width: 160px; height: 160px; }
     .hue-bar-wrap, .hue-bar-wrap canvas { height: 160px; }
