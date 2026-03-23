@@ -28,7 +28,6 @@
   body {
     font-family: "AR One Sans", sans-serif;
     background: var(--brand-bg); color: var(--brand); padding: 0;
-    padding-bottom: calc(50px + env(safe-area-inset-bottom, 0px));
   }
 
   /* --- Top nav bar --- */
@@ -69,11 +68,9 @@
 
   /* --- Source / disclaimer footer --- */
   .source-footer {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 18;
     padding: 10px 16px; white-space: normal;
     font-size: 0.72rem; line-height: 1.6; color: rgba(27,67,50,0.6);
-    background: rgba(240,247,244,0.97); backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    background: rgba(240,247,244,0.97);
     border-top: 1px solid var(--border-light);
     text-align: center;
     padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
