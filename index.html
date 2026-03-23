@@ -2682,6 +2682,8 @@ renderChart();
 
   openCameraBtn.addEventListener('click', () => {
     camOverlay.classList.add('visible');
+    /* Skip the start screen — launch the camera immediately */
+    camStartCamera();
   });
 
   function closeCamera() {
