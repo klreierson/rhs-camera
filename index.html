@@ -483,10 +483,10 @@
   }
   @media (max-width: 640px) {
     .picker-wheel-btn.picker-open {
-      right: calc(72vw - 50px + 20px + 8px);
+      right: calc(72vw - 50px + 8px);
     }
     #openCameraBtn.picker-open {
-      right: calc(72vw - 50px + 20px + 50px);
+      right: calc(72vw - 50px + 50px);
     }
   }
 
@@ -905,10 +905,10 @@
       padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
     }
 
-    /* Picker overlay: narrower on mobile with 20px gap from screen edge */
+    /* Picker overlay: narrower on mobile so more of the photo is visible */
     .picker-overlay {
       width: calc(72vw - 50px); max-width: 250px; min-width: 0;
-      right: 20px;
+      right: 0;
       overflow-x: hidden;
     }
     .picker-overlay .sl-area,
